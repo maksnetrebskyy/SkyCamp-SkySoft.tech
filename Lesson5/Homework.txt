@@ -1,0 +1,6 @@
+LEFT JOIN Customers on Customers.CustomerID = Orders.CustomerID
+LEFT JOIN OrderDetails on OrderDetails.OrderID = Orders.OrderID
+LEFT JOIN Products on OrderDetails.ProductID = Products.ProductID
+GROUP BY Customers.CustomerID
+ORDER BY TotalPrice DESC
+LIMIT 3
