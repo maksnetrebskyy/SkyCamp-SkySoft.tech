@@ -6,34 +6,38 @@ const urlencodedParser = express.urlencoded({extended: false});
 
 function createHash(userPassword) {
   const salt = bcrypt.genSaltSync(10);
-  console.log(salt);
-    return bcrypt.hashSync(userPassword, salt);
+  const hash = bcrypt.hashSync(userPassword, salt);
+  return {
+      hash,
+      salt,
+  }
 }
 
-function checkUser(userName, hash) {
+function checkUser(userName, userPassword) {
     const data = fs.readFileSync('users.txt', 'utf-8');
-    const users = []
 
+    const users = []
     data.split(';').forEach(item => {
         if (!item.length) return
 
         const [userName, hash] = item.split(' ')
         users.push({
             userName,
-            hash,
+            hash
         })
     })
 
-    let currentUser = users.find(item => item.userName === userName)
+    const currentUser = users.find(item => item.userName === userName)
 
     if (!currentUser) {
-        const newData = `${data}${userName} ${hash};`
+        const { hash, salt } = createHash(userPassword)
+        const newData = `${data}${userName} ${hash} ${salt};`
 
         fs.writeFileSync('users.txt', newData, 'utf-8');
         return true
     }
 
-    return currentUser.hash === 'hash'
+    return bcrypt.compareSync(Buffer.from(userPassword), currentUser.hash)
 }
 
 app.use(express.static(__dirname));
@@ -53,14 +57,12 @@ app.post("/", urlencodedParser, function (request, response) {
         return response.sendStatus(400);
     }
 
-    const hash = createHash(userPassword)
-    const isLoggedIn = checkUser(userName, hash)
+    const isLoggedIn = checkUser(userName, userPassword)
     if (!isLoggedIn) response.sendStatus(400)
     response.sendStatus(200)
 });
 
 app.listen(3000, () => console.log('Server work'));
-
 
 
 
