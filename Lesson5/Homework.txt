@@ -1,6 +1,56 @@
+1)
 LEFT JOIN Customers on Customers.CustomerID = Orders.CustomerID
 LEFT JOIN OrderDetails on OrderDetails.OrderID = Orders.OrderID
 LEFT JOIN Products on OrderDetails.ProductID = Products.ProductID
 GROUP BY Customers.CustomerID
 ORDER BY TotalPrice DESC
 LIMIT 3
+
+
+2)
+SELECT 
+  *,
+    COUNT(Orders.OrderID) as OrderCount
+FROM Orders
+LEFT JOIN Customers on Customers.CustomerID = Orders.CustomerID
+LEFT JOIN OrderDetails on OrderDetails.OrderID = Orders.OrderID
+GROUP BY Customers.CustomerID
+ORDER BY OrderCount DESC
+LIMIT 3
+
+
+3)
+SELECT 
+  *,
+    Products.Price * OrderDetails.Quantity as OrderPrice
+FROM Orders
+LEFT JOIN OrderDetails on OrderDetails.OrderID = Orders.OrderID
+LEFT JOIN Products on OrderDetails.ProductID = Products.ProductID
+ORDER BY OrderPrice DESC
+LIMIT 1
+
+
+4)
+SELECT 
+  Categories.CategoryName,
+    AVG(Products.Price * OrderDetails.Quantity) as AVGPrice
+FROM Orders
+LEFT JOIN OrderDetails on OrderDetails.OrderID = Orders.OrderID
+LEFT JOIN Products on OrderDetails.ProductID = Products.ProductID
+LEFT JOIN Categories on Products.CategoryID = Categories.CategoryID
+WHERE Categories.CategoryName = "Meat/Poultry"
+
+
+5)
+SELECT 
+    Employees.EmployeeID,
+    Employees.FirstName,
+    Employees.LastName,
+    Categories.CategoryName,
+    SUM(Products.Price * OrderDetails.Quantity) OrderSum
+FROM Orders
+LEFT JOIN OrderDetails on OrderDetails.OrderID = Orders.OrderID
+LEFT JOIN Employees on Employees.EmployeeID = Orders.EmployeeID
+LEFT JOIN Products on OrderDetails.ProductID = Products.ProductID
+LEFT JOIN Categories on Products.CategoryID = Categories.CategoryID
+GROUP BY Employees.EmployeeID, Categories.CategoryID
