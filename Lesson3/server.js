@@ -10,8 +10,8 @@ http.createServer(function(req, res){
         });
     }
     else if(req.url.match('style.css')){
-        var cssPath = path.join(__dirname, req.url);
-        var fileStream = fs.createReadStream(cssPath);
+        let cssPath = path.join(__dirname, req.url);
+        let fileStream = fs.createReadStream(cssPath);
         res.writeHead(200, {"Content-Type": "text/css"});
         fileStream.pipe(res);
     }
